@@ -6,8 +6,8 @@ POST : http://localhost:5000/api/signup
 
 Body
 {
-    "name" : "moulee",
-    "email" : "moulee123@gmail.com",
+    "name" : "mouleeswaran",
+    "email" : "moulee324@gmail.com",
     "password" : "alteroffice"
 }
 
@@ -16,14 +16,13 @@ Response
     "message": "User created successfully",
     "data": [
         {
-            "id": 1,
-            "name": "moulee",
-            "email": "moulee123@gmail.com",
-            "password": "alteroffice"
+            "id": 6,
+            "name": "mouleeswaran",
+            "email": "moulee324@gmail.com",
+            "password": "$2b$10$uIWUrc1IpIG9QAFUPjDq1OjW0G9VMalGPkcAIPAt.mglhrk1fZLDK"
         }
     ]
 }
-
 
 
 
