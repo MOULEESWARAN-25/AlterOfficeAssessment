@@ -1,7 +1,34 @@
 # Api End points
 
+# SignUP
+
+POST : http://localhost:5000/api/signup
+
+Body
+{
+    "name" : "moulee",
+    "email" : "moulee123@gmail.com",
+    "password" : "alteroffice"
+}
+
+Response
+{
+    "message": "User created successfully",
+    "data": [
+        {
+            "id": 1,
+            "name": "moulee",
+            "email": "moulee123@gmail.com",
+            "password": "alteroffice"
+        }
+    ]
+}
+
+
+
 
 # CRUD operation for creating the todos
+
 GET : http://localhost:5000/api/todo
 
 Response
