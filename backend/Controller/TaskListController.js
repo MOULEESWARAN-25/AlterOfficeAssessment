@@ -4,7 +4,8 @@ const getTask = async(req, res) => {
     try{
         const {data, error} = await supabase
             .from("TodoList")
-            .select(`todo_id, todo_name, Tasks(id, task_name)`);
+            .select(`todo_id, todo_name, Tasks(id, task_name)`)
+            .eq('user_id', req.user.id);
         if(error) throw error;
         res.status(200).send(data);
     }catch(error){

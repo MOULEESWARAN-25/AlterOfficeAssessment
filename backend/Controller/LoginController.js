@@ -10,7 +10,7 @@ const Login = async (req, res) => {
 
     const { data, error } = await supabase
       .from("Users")
-      .select("name,email,password")
+      .select("id,name,email,password")
       .eq("email", email)
       .limit(1);
 
@@ -22,7 +22,7 @@ const Login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
-    const safeUser = { name: user.name, email: user.email };
+    const safeUser = { id: user.id, name: user.name, email: user.email };
     const token = jwt.sign(safeUser, process.env.JWT_SECRET || "alteroffice", {
       expiresIn: "24h",
     });

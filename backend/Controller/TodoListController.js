@@ -4,7 +4,8 @@ const getTodo = async(req, res) => {
     try{
         const {data, error} = await supabase
             .from("TodoList")
-            .select("*");
+            .select("*")
+            .eq('user_id', req.user.id);
         if(error) throw error;
         res.status(200).send(data);
     }catch(error){
@@ -16,7 +17,7 @@ const addTodo = async (req, res) => {
         const todo_name = req.body.todo_name;
         const {data, error} = await supabase
             .from("TodoList")
-            .insert([{todo_name}])
+            .insert([{todo_name, user_id: req.user.id}])
             .select();
         if(error) throw error;
         res.status(201).json({message : "Task Created Successfully", data});
@@ -33,6 +34,7 @@ const renameTodo = async(req, res) => {
             .from("TodoList")
             .update({todo_name : new_name})
             .eq('todo_id', id)
+            .eq('user_id', req.user.id)
             .select();
         if(error) throw error;
         res.status(200).json({message : "Task name updated Successfully", data});
@@ -47,7 +49,8 @@ const deleteTodo = async(req, res) => {
         const {data, error} = await supabase
             .from("TodoList")
             .delete()
-            .eq('todo_id', id);
+            .eq('todo_id', id)
+            .eq('user_id', req.user.id);
         if(error) throw error;
         res.status(200).json({message : "Task is Successfully deleted"});
     }catch(error){
