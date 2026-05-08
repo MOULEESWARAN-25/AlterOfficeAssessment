@@ -28,7 +28,7 @@ const addTodo = async (req, res) => {
 
 const renameTodo = async(req, res) => {
     try{
-        const {id} = req.params;
+        const {id} = req.query;
         const {new_name} = req.body;
         const {data, error} = await supabase
             .from("TodoList")
@@ -44,7 +44,7 @@ const renameTodo = async(req, res) => {
 
 const deleteTodo = async(req, res) => {
     try{
-        const {id} = req.params;
+        const {id} = req.query;
         const {data, error} = await supabase
             .from("TodoList")
             .delete()

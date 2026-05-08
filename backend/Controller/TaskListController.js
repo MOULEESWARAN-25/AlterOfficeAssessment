@@ -11,13 +11,14 @@ const getTask = async(req, res) => {
         res.status(500).json({error : error.message});
     }
 }
-const addtask = async (req, res) => {
+const addTask = async (req, res) => {
     try{
-        const {todo_id} = req.params;
-        // console.log(task_name);
+        const {todo_id} = req.query;
+        const {task_name, tags} = req.body;
+        console.log(task_name, todo_id);
         const {data, error} = await supabase
             .from("Tasks")
-            .insert([{task_name, todo_id}])
+            .insert([{task_name, tags, todo_id}])
             .select();
         if(error) throw error;
         res.status(201).json({message : "Task Created Successfully", data});
@@ -26,14 +27,15 @@ const addtask = async (req, res) => {
     }
 }
 
-const renametask = async(req, res) => {
+const renameTask = async(req, res) => {
     try{
         const {id, todo_id} = req.params;
         const {new_name} = req.body;
         const {data, error} = await supabase
-            .from("taskList")
+            .from("Tasks")
             .update({task_name : new_name})
             .eq('task_id', id)
+            .eq('todo_id', todo_id)
             .select();
         if(error) throw error;
         res.status(200).json({message : "Task name updated Successfully", data});
@@ -42,13 +44,14 @@ const renametask = async(req, res) => {
     }
 }
 
-const deletetask = async(req, res) => {
+const deleteTask = async(req, res) => {
     try{
-        const {id} = req.params;
+        const {id, todo_id} = req.params;
         const {data, error} = await supabase
-            .from("taskList")
+            .from("Tasks")
             .delete()
-            .eq('task_id', id);
+            .eq('task_id', id)
+            .eq('todo_id', todo_id)
         if(error) throw error;
         res.status(200).json({message : "Task is Successfully deleted"});
     }catch(error){
@@ -56,6 +59,6 @@ const deletetask = async(req, res) => {
     }
 }
 module.exports = {
-    gettask, addtask, renametask, deletetask
+    getTask, addTask, renameTask, deleteTask
 }
 
