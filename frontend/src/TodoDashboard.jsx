@@ -28,7 +28,7 @@ export default function TodoDashboard() {
 
   const loadData = async () => {
     try {
-      const response = await axios.get("https://todo-app-alteroffice.vercel.app/api/task/", getConfig());
+      const response = await axios.get("https://alter-office-assessment-backend.vercel.app/api/task/", getConfig());
       setLists(response.data || []);
     } catch (error) {
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -43,7 +43,7 @@ export default function TodoDashboard() {
     if (!listName.trim()) return;
 
     try {
-      await axios.post("https://todo-app-alteroffice.vercel.app/api/todo/", { todo_name: listName }, getConfig());
+      await axios.post("https://alter-office-assessment-backend.vercel.app/api/todo/", { todo_name: listName }, getConfig());
       setListName("");
       loadData();
     } catch (error) {
@@ -53,7 +53,7 @@ export default function TodoDashboard() {
 
   const removeList = async (id) => {
     try {
-      await axios.delete(`https://todo-app-alteroffice.vercel.app/api/todo/delete-todo?id=${id}`, getConfig());
+      await axios.delete(`https://alter-office-assessment-backend.vercel.app/api/todo/delete-todo?id=${id}`, getConfig());
       loadData();
     } catch (error) {
       console.error(error);
@@ -65,7 +65,7 @@ export default function TodoDashboard() {
     if (!newName || newName === currentName) return;
 
     try {
-      await axios.patch(`https://todo-app-alteroffice.vercel.app/api/todo/update-todo?id=${id}`, { new_name: newName }, getConfig());
+      await axios.patch(`https://alter-office-assessment-backend.vercel.app/api/todo/update-todo?id=${id}`, { new_name: newName }, getConfig());
       loadData();
     } catch (error) {
       console.error(error);
@@ -77,7 +77,7 @@ export default function TodoDashboard() {
     if (!taskName?.trim()) return;
 
     try {
-      await axios.post(`https://todo-app-alteroffice.vercel.app/api/task/?todo_id=${listId}`, { task_name: taskName }, getConfig());
+      await axios.post(`https://alter-office-assessment-backend.vercel.app/api/task/?todo_id=${listId}`, { task_name: taskName }, getConfig());
       setTaskNames({ ...taskNames, [listId]: "" });
       loadData();
     } catch (error) {
@@ -87,7 +87,7 @@ export default function TodoDashboard() {
 
   const removeTask = async (taskId, listId) => {
     try {
-      await axios.delete(`https://todo-app-alteroffice.vercel.app/api/task/delete-task?id=${taskId}&todo_id=${listId}`, getConfig());
+      await axios.delete(`https://alter-office-assessment-backend.vercel.app/api/task/delete-task?id=${taskId}&todo_id=${listId}`, getConfig());
       loadData();
     } catch (error) {
       console.error(error);
@@ -99,7 +99,7 @@ export default function TodoDashboard() {
     if (!newName || newName === currentName) return;
 
     try {
-      await axios.patch(`https://todo-app-alteroffice.vercel.app/api/task/update-task?id=${taskId}&todo_id=${listId}`, { new_name: newName }, getConfig());
+      await axios.patch(`https://alter-office-assessment-backend.vercel.app/api/task/update-task?id=${taskId}&todo_id=${listId}`, { new_name: newName }, getConfig());
       loadData();
     } catch (error) {
       console.error(error);

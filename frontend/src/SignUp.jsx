@@ -16,7 +16,7 @@ export default function Signup() {
 
     try {
       setLoading(true);
-      await axios.post("https://todo-app-alteroffice.vercel.app/api/signup", { name, email, password });
+      await axios.post("https://alter-office-assessment-backend.vercel.app/api/signup", { name, email, password });
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred");

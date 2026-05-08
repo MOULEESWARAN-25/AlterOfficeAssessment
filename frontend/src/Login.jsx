@@ -15,7 +15,7 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const response = await axios.post("https://todo-app-alteroffice.vercel.app/api/login", { email, password });
+      const response = await axios.post("https://alter-office-assessment-backend.vercel.app/api/login", { email, password });
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
