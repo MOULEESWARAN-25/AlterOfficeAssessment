@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
-import Signup from './Signup';
+import Signup from './SignUp';
 import TodoDashboard from './TodoDashboard';
 
-const AppTodo = () => {
+const App = () => {
   return (
     <Router>
       <Routes>
@@ -17,4 +17,4 @@ const AppTodo = () => {
   );
 };
 
-export default AppTodo;
+export default App;
