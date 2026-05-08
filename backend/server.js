@@ -18,10 +18,8 @@ app.use("/api/signup/", SignUpRouter);
 app.use("/api/login/", LoginRouter);
 
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log("Server Started");
-  });
-}
+app.listen(PORT, () => {
+  console.log("Server Started");
+});
 
 module.exports = app;
