@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const mockTodos = [
   {
     id: 1,
-    title: 'Buy vegetables',
-    category: 'Groceries',
+    title: "Buy vegetables",
+    category: "Groceries",
     completed: false,
   },
   {
     id: 2,
-    title: 'Finish React assignment',
-    category: 'Technology',
+    title: "Finish React assignment",
+    category: "Technology",
     completed: true,
   },
 ];
 
-const sample_todos = ['Groceries', 'Technology', 'Personal', 'Work', 'Health'];
+const sample_todos = ["Groceries", "Technology", "Personal", "Work", "Health"];
 
 export default function TodoDashboard() {
   const [todos, setTodos] = useState(mockTodos);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Personal');
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("Personal");
 
   useEffect(() => {
     fetchTodos();
@@ -28,55 +28,66 @@ export default function TodoDashboard() {
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/todo');
+      const response = await fetch("http://localhost:3000/api/todo/");
       const data = await response.json();
-      console.log(data);
+      // backend returns objects with todo_id and todo_name
+      const mapped = (data || []).map((d) => ({
+        id: d.todo_id || d.id,
+        title: d.todo_name || d.title || "",
+        category: d.category || "Personal",
+        completed: !!d.completed,
+      }));
+      console.log(mapped);
+      setTodos(mapped);
     } catch (error) {
-      console.error('Fetch todos error:', error);
+      console.error("Fetch todos error:", error);
     }
   };
 
   const createTodo = async (todo_name) => {
     try {
-      const response = await fetch('http://localhost:5000/api/todo', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/api/todo/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(todo_name),
+        body: JSON.stringify({ todo_name }),
       });
 
       const data = await response.json();
       console.log(data);
     } catch (error) {
-      console.error('Create todo error:', error);
+      console.error("Create todo error:", error);
     }
   };
 
   const deleteTodo = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/todos/${id}`, {
-        method: 'DELETE',
+      await fetch(`http://localhost:3000/api/todo/delete-todo?id=${id}`, {
+        method: "DELETE",
       });
     } catch (error) {
-      console.error('Delete todo error:', error);
+      console.error("Delete todo error:", error);
     }
   };
 
   const updateTodo = async (id, updatedTodo) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `http://localhost:3000/api/todo/update-todo?id=${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ new_name: updatedTodo.title }),
         },
-        body: JSON.stringify(updatedTodo),
-      });
+      );
 
       const data = await response.json();
       console.log(data);
     } catch (error) {
-      console.error('Update todo error:', error);
+      console.error("Update todo error:", error);
     }
   };
 
@@ -93,18 +104,17 @@ export default function TodoDashboard() {
     };
 
     setTodos([...todos, newTodo]);
-    createTodo(newTodo);
-    setTitle('');
+    createTodo(newTodo.title);
+    setTitle("");
   };
 
   const handleToggleTodo = (id) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    setTodos(updatedTodos);
-
     const todo = todos.find((t) => t.id === id);
-    updateTodo(id, { ...todo, completed: !todo.completed });
+    if (!todo) return;
+    const updated = { ...todo, completed: !todo.completed };
+    const updatedTodos = todos.map((t) => (t.id === id ? updated : t));
+    setTodos(updatedTodos);
+    updateTodo(id, { ...updated });
   };
 
   const handleDeleteTodo = (id) => {
@@ -120,14 +130,21 @@ export default function TodoDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Todo Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Todo Dashboard
+        </h1>
 
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Add New Todo</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Add New Todo
+          </h2>
 
           <form onSubmit={handleAddTodo} className="space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Todo Title
               </label>
               <input
@@ -141,7 +158,10 @@ export default function TodoDashboard() {
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Category
               </label>
               <select
@@ -177,7 +197,9 @@ export default function TodoDashboard() {
                 </h3>
 
                 {catTodos.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No todos in this category</p>
+                  <p className="text-gray-500 text-sm">
+                    No todos in this category
+                  </p>
                 ) : (
                   <div className="space-y-2 bg-white rounded-lg shadow-md p-4">
                     {catTodos.map((todo) => (
@@ -195,8 +217,8 @@ export default function TodoDashboard() {
                           <span
                             className={`text-sm ${
                               todo.completed
-                                ? 'text-gray-500 line-through'
-                                : 'text-gray-900'
+                                ? "text-gray-500 line-through"
+                                : "text-gray-900"
                             }`}
                           >
                             {todo.title}
@@ -220,7 +242,8 @@ export default function TodoDashboard() {
 
         <div className="mt-8 text-center">
           <p className="text-gray-600 text-sm">
-            Total todos: {todos.length} | Completed: {todos.filter((t) => t.completed).length}
+            Total todos: {todos.length} | Completed:{" "}
+            {todos.filter((t) => t.completed).length}
           </p>
         </div>
       </div>
