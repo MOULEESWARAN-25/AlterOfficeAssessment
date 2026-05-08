@@ -15,7 +15,7 @@ const mockTodos = [
   },
 ];
 
-const CATEGORIES = ['Groceries', 'Technology', 'Personal', 'Work', 'Health'];
+const sample_todos = ['Groceries', 'Technology', 'Personal', 'Work', 'Health'];
 
 export default function TodoDashboard() {
   const [todos, setTodos] = useState(mockTodos);
@@ -28,7 +28,7 @@ export default function TodoDashboard() {
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/todos');
+      const response = await fetch('http://localhost:5000/api/todo');
       const data = await response.json();
       console.log(data);
     } catch (error) {
@@ -36,14 +36,14 @@ export default function TodoDashboard() {
     }
   };
 
-  const createTodo = async (todo) => {
+  const createTodo = async (todo_name) => {
     try {
-      const response = await fetch('http://localhost:5000/api/todos', {
+      const response = await fetch('http://localhost:5000/api/todo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(todo),
+        body: JSON.stringify(todo_name),
       });
 
       const data = await response.json();
@@ -112,7 +112,7 @@ export default function TodoDashboard() {
     deleteTodo(id);
   };
 
-  const todosByCategory = CATEGORIES.reduce((acc, cat) => {
+  const todosByCategory = sample_todos.reduce((acc, cat) => {
     acc[cat] = todos.filter((todo) => todo.category === cat);
     return acc;
   }, {});
@@ -150,7 +150,7 @@ export default function TodoDashboard() {
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {CATEGORIES.map((cat) => (
+                {sample_todos.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -168,7 +168,7 @@ export default function TodoDashboard() {
         </div>
 
         <div className="space-y-6">
-          {CATEGORIES.map((cat) => {
+          {sample_todos.map((cat) => {
             const catTodos = todosByCategory[cat];
             return (
               <div key={cat}>
