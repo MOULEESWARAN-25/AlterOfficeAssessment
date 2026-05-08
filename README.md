@@ -1,12 +1,3 @@
-# AlterOffice Assessment
-
-## Deployed Links
-
-- **Frontend Application**: [https://todo-app-alteroffice.vercel.app/](https://todo-app-alteroffice.vercel.app/)
-- **Backend API**: [https://alter-office-assessment-backend.vercel.app/](https://alter-office-assessment-backend.vercel.app/)
-
----
-
 # API Endpoints
 
 ## Authentication
