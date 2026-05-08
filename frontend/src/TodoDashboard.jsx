@@ -1,250 +1,211 @@
 import { useState, useEffect } from "react";
-
-const mockTodos = [
-  {
-    id: 1,
-    title: "Buy vegetables",
-    category: "Groceries",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "Finish React assignment",
-    category: "Technology",
-    completed: true,
-  },
-];
-
-const sample_todos = ["Groceries", "Technology", "Personal", "Work", "Health"];
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function TodoDashboard() {
-  const [todos, setTodos] = useState(mockTodos);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Personal");
+  const [lists, setLists] = useState([]);
+  const [listName, setListName] = useState("");
+  const [taskNames, setTaskNames] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTodos();
+    loadData();
   }, []);
 
-  const fetchTodos = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/todo/");
-      const data = await response.json();
-      // backend returns objects with todo_id and todo_name
-      const mapped = (data || []).map((d) => ({
-        id: d.todo_id || d.id,
-        title: d.todo_name || d.title || "",
-        category: d.category || "Personal",
-        completed: !!d.completed,
-      }));
-      console.log(mapped);
-      setTodos(mapped);
-    } catch (error) {
-      console.error("Fetch todos error:", error);
-    }
-  };
-
-  const createTodo = async (todo_name) => {
-    try {
-      const response = await fetch("http://localhost:3000/api/todo/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ todo_name }),
-      });
-
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error("Create todo error:", error);
-    }
-  };
-
-  const deleteTodo = async (id) => {
-    try {
-      await fetch(`http://localhost:3000/api/todo/delete-todo?id=${id}`, {
-        method: "DELETE",
-      });
-    } catch (error) {
-      console.error("Delete todo error:", error);
-    }
-  };
-
-  const updateTodo = async (id, updatedTodo) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/todo/update-todo?id=${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ new_name: updatedTodo.title }),
-        },
-      );
-
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error("Update todo error:", error);
-    }
-  };
-
-  const handleAddTodo = (e) => {
-    e.preventDefault();
-
-    if (!title.trim()) return;
-
-    const newTodo = {
-      id: Date.now(),
-      title,
-      category,
-      completed: false,
+  const getConfig = () => {
+    const token = localStorage.getItem("token");
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     };
-
-    setTodos([...todos, newTodo]);
-    createTodo(newTodo.title);
-    setTitle("");
   };
 
-  const handleToggleTodo = (id) => {
-    const todo = todos.find((t) => t.id === id);
-    if (!todo) return;
-    const updated = { ...todo, completed: !todo.completed };
-    const updatedTodos = todos.map((t) => (t.id === id ? updated : t));
-    setTodos(updatedTodos);
-    updateTodo(id, { ...updated });
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
-  const handleDeleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-    deleteTodo(id);
+  const loadData = async () => {
+    try {
+      const response = await axios.get("https://todo-app-alteroffice.vercel.app/api/task/", getConfig());
+      setLists(response.data || []);
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        logout();
+      }
+      console.error(error);
+    }
   };
 
-  const todosByCategory = sample_todos.reduce((acc, cat) => {
-    acc[cat] = todos.filter((todo) => todo.category === cat);
-    return acc;
-  }, {});
+  const addList = async (e) => {
+    e.preventDefault();
+    if (!listName.trim()) return;
+
+    try {
+      await axios.post("https://todo-app-alteroffice.vercel.app/api/todo/", { todo_name: listName }, getConfig());
+      setListName("");
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const removeList = async (id) => {
+    try {
+      await axios.delete(`https://todo-app-alteroffice.vercel.app/api/todo/delete-todo?id=${id}`, getConfig());
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const renameList = async (id, currentName) => {
+    const newName = prompt("Enter new list name:", currentName);
+    if (!newName || newName === currentName) return;
+
+    try {
+      await axios.patch(`https://todo-app-alteroffice.vercel.app/api/todo/update-todo?id=${id}`, { new_name: newName }, getConfig());
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addTask = async (listId) => {
+    const taskName = taskNames[listId];
+    if (!taskName?.trim()) return;
+
+    try {
+      await axios.post(`https://todo-app-alteroffice.vercel.app/api/task/?todo_id=${listId}`, { task_name: taskName }, getConfig());
+      setTaskNames({ ...taskNames, [listId]: "" });
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const removeTask = async (taskId, listId) => {
+    try {
+      await axios.delete(`https://todo-app-alteroffice.vercel.app/api/task/delete-task?id=${taskId}&todo_id=${listId}`, getConfig());
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const renameTask = async (taskId, listId, currentName) => {
+    const newName = prompt("Enter new task name:", currentName);
+    if (!newName || newName === currentName) return;
+
+    try {
+      await axios.patch(`https://todo-app-alteroffice.vercel.app/api/task/update-task?id=${taskId}&todo_id=${listId}`, { new_name: newName }, getConfig());
+      loadData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Todo Dashboard
-        </h1>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">My Dashboard</h1>
+          <button 
+            onClick={logout} 
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Add New Todo
-          </h2>
-
-          <form onSubmit={handleAddTodo} className="space-y-4">
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Todo Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="What needs to be done?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="category"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Category
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {sample_todos.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              Add Todo
+        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">Create a New List</h2>
+          <form onSubmit={addList} className="flex gap-2">
+            <input
+              type="text"
+              value={listName}
+              onChange={(e) => setListName(e.target.value)}
+              placeholder="List name"
+              className="flex-1 border border-gray-300 p-2 rounded focus:outline-none focus:border-blue-500"
+            />
+            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Add List
             </button>
           </form>
         </div>
 
-        <div className="space-y-6">
-          {sample_todos.map((cat) => {
-            const catTodos = todosByCategory[cat];
-            return (
-              <div key={cat}>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  {cat} ({catTodos.length})
-                </h3>
+        <div className="grid gap-6 md:grid-cols-2">
+          {lists.map((list) => (
+            <div key={list.todo_id} className="bg-white p-5 rounded-lg shadow border border-gray-200">
+              <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                <h3 className="text-lg font-bold text-gray-800">{list.todo_name}</h3>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => renameList(list.todo_id, list.todo_name)} 
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Rename
+                  </button>
+                  <button 
+                    onClick={() => removeList(list.todo_id)} 
+                    className="text-sm text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
 
-                {catTodos.length === 0 ? (
-                  <p className="text-gray-500 text-sm">
-                    No todos in this category
-                  </p>
+              <div className="mb-4">
+                {(!list.Tasks || list.Tasks.length === 0) ? (
+                  <p className="text-gray-500 text-sm">No tasks yet.</p>
                 ) : (
-                  <div className="space-y-2 bg-white rounded-lg shadow-md p-4">
-                    {catTodos.map((todo) => (
-                      <div
-                        key={todo.id}
-                        className="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <input
-                            type="checkbox"
-                            checked={todo.completed}
-                            onChange={() => handleToggleTodo(todo.id)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                          />
-                          <span
-                            className={`text-sm ${
-                              todo.completed
-                                ? "text-gray-500 line-through"
-                                : "text-gray-900"
-                            }`}
+                  <ul className="space-y-2">
+                    {list.Tasks.map((task) => (
+                      <li key={task.id} className="flex justify-between items-center bg-gray-50 p-2 rounded border">
+                        <span className="text-gray-700">{task.task_name}</span>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => renameTask(task.id, list.todo_id, task.task_name)} 
+                            className="text-xs text-blue-600 hover:underline"
                           >
-                            {todo.title}
-                          </span>
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => removeTask(task.id, list.todo_id)} 
+                            className="text-xs text-red-600 hover:underline"
+                          >
+                            Remove
+                          </button>
                         </div>
-
-                        <button
-                          onClick={() => handleDeleteTodo(todo.id)}
-                          className="px-3 py-1 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 )}
               </div>
-            );
-          })}
-        </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-600 text-sm">
-            Total todos: {todos.length} | Completed:{" "}
-            {todos.filter((t) => t.completed).length}
-          </p>
+              <div className="flex gap-2 mt-4">
+                <input
+                  type="text"
+                  value={taskNames[list.todo_id] || ""}
+                  onChange={(e) => setTaskNames({ ...taskNames, [list.todo_id]: e.target.value })}
+                  placeholder="New task..."
+                  className="flex-1 border border-gray-300 p-2 text-sm rounded focus:outline-none focus:border-green-500"
+                />
+                <button 
+                  onClick={() => addTask(list.todo_id)} 
+                  className="bg-green-600 text-white px-3 py-2 text-sm rounded hover:bg-green-700"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          ))}
+          {lists.length === 0 && (
+            <p className="text-gray-600 col-span-2 text-center py-8">
+              No lists found. Create one to get started!
+            </p>
+          )}
         </div>
       </div>
     </div>

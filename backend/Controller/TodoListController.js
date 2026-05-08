@@ -14,7 +14,6 @@ const getTodo = async(req, res) => {
 const addTodo = async (req, res) => {
     try{
         const todo_name = req.body.todo_name;
-        // console.log(todo_name);
         const {data, error} = await supabase
             .from("TodoList")
             .insert([{todo_name}])

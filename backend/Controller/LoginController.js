@@ -1,5 +1,6 @@
 const supabase = require("../Config/SupabaseConfig");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const Login = async (req, res) => {
   try {
@@ -22,9 +23,13 @@ const Login = async (req, res) => {
     if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
     const safeUser = { name: user.name, email: user.email };
+    const token = jwt.sign(safeUser, process.env.JWT_SECRET || "alteroffice", {
+      expiresIn: "24h",
+    });
+
     return res
       .status(200)
-      .json({ message: "Login successful", user: safeUser });
+      .json({ message: "Login successful", user: safeUser, token });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

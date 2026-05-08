@@ -1,17 +1,31 @@
-# Api End points
+# AlterOffice Assessment
 
-# SignUP
+## Deployed Links
 
-POST : http://localhost:5000/api/signup
+- **Frontend Application**: [https://todolist-alteroffice.vercel.app/](https://todolist-alteroffice.vercel.app/)
+- **Backend API**: [https://todo-app-alteroffice.vercel.app/](https://todo-app-alteroffice.vercel.app/)
+
+---
+
+# API Endpoints
+
+## Authentication
+
+### SignUP
+
+POST : https://todo-app-alteroffice.vercel.app/api/signup
 
 Body
+```json
 {
     "name" : "mouleeswaran",
     "email" : "moulee324@gmail.com",
     "password" : "alteroffice"
 }
+```
 
 Response
+```json
 {
     "message": "User created successfully",
     "data": [
@@ -23,14 +37,36 @@ Response
         }
     ]
 }
+```
 
+### Login
 
+POST : https://todo-app-alteroffice.vercel.app/api/login
 
-# CRUD operation for creating the todos
-
-GET : http://localhost:5000/api/todo
+Body
+```json
+{
+    "email" : "moulee324@gmail.com",
+    "password" : "alteroffice"
+}
+```
 
 Response
+```json
+{
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5c..."
+}
+```
+
+---
+
+## CRUD operation for creating the todos
+
+GET : https://todo-app-alteroffice.vercel.app/api/todo
+
+Response
+```json
 [
     {
         "todo_id": 5,
@@ -41,19 +77,19 @@ Response
         "todo_name": "PendingTasks"
     }
 ]
+```
 
-
-
-
-
-POST : http://localhost:5000/api/todo
+POST : https://todo-app-alteroffice.vercel.app/api/todo
 
 Body
+```json
 {
     "todo_name" : "AlterOffice Task"
 }
+```
 
 Response
+```json
 {
     "message": "Task Created Successfully",
     "data": [
@@ -63,18 +99,19 @@ Response
         }
     ]
 }
+```
 
-
-
-
-PATCH : http://localhost:5000/api/todo/update-todo?id=7
+PATCH : https://todo-app-alteroffice.vercel.app/api/todo/update-todo?id=7
 
 Body
+```json
 {
     "new_name" : "AlterOffice Assessment"
 }
+```
 
 Response
+```json
 {
     "message": "Task name updated Successfully",
     "data": [
@@ -84,25 +121,25 @@ Response
         }
     ]
 }
+```
 
-
-
-
-DELETE : http://localhost:5000/api/todo/delete-todo?id=5
+DELETE : https://todo-app-alteroffice.vercel.app/api/todo/delete-todo?id=5
 
 Response
+```json
 {
-    {
     "message": "Task is Successfully deleted"
-    }
 }
+```
 
+---
 
-# CRUD operation for creating the tasks inside the todos
+## CRUD operation for creating the tasks inside the todos
 
-GET : http://localhost:5000/api/task/
+GET : https://todo-app-alteroffice.vercel.app/api/task/
 
 Response
+```json
 [
     {
         "todo_id": 6,
@@ -115,18 +152,21 @@ Response
         "Tasks": []
     }
 ]
+```
 
-POST : http://localhost:5000/api/task?todo_id=7
+POST : https://todo-app-alteroffice.vercel.app/api/task?todo_id=7
 
 Body
+```json
 {
     "task_name" : "Completed the backend api endpoints",
     "tags" : "#Important"
 }
+```
 
 Response
+```json
 {
-    {
     "message": "Task Created Successfully",
     "data": [
         {
@@ -136,17 +176,20 @@ Response
             "todo_id": 7
         }
     ]
-    }
 }
+```
 
-PATCH : http://localhost:5000/api/task/update-task?id=21&todo_id=7
+PATCH : https://todo-app-alteroffice.vercel.app/api/task/update-task?id=21&todo_id=7
 
 Body
+```json
 {
     "new_name" : "Completed the backend api endpoints for tasks and todos"
 }
+```
 
 Response
+```json
 {
     "message": "Task name updated Successfully",
     "data": [
@@ -158,10 +201,13 @@ Response
         }
     ]
 }
+```
 
-DELETE : http://localhost:5000/api/task/delete-task?id=21&todo_id=7
+DELETE : https://todo-app-alteroffice.vercel.app/api/task/delete-task?id=21&todo_id=7
 
 Response
+```json
 {
     "message": "Task is Successfully deleted"
 }
+```

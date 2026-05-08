@@ -1,28 +1,23 @@
-# Dependency directories
 node_modules/
 jspm_packages/
 
-# Environment variables (Sensitive Info)
 .env
 .env.local
 .env.*.local
 
-# Logs
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
 
-# Build outputs
 dist/
 build/
 
-# Debugging and coverage
 .nyc_output
 coverage/
 .vscode/
 .idea/
 
-# OS-specific files
 .DS_Store
 Thumbs.db
