@@ -11,7 +11,7 @@ const verifyToken = (req, res, next) => {
     return res.status(403).json({ error: "Malformed token" });
   }
 
-  jwt.verify(token, "alteroffice", (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET || "alteroffice", (err, decoded) => {
     if (err) {
       return res.status(401).json({ error: "Unauthorized" });
     }
