@@ -7,6 +7,12 @@ const CreateUser = async (req, res) => {
     if (!name || !email || !password)
       return res.status(400).json({ error: "Some of the fields are missing" });
 
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
     const { data: existing, error: checkErr } = await supabase
       .from("Users")
       .select("email")
