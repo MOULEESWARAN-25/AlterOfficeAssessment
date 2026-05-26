@@ -201,3 +201,55 @@ Response
 {
     "message": "Task is Successfully deleted"
 }
+
+---
+
+## Database Schema & Optimization Guidelines
+
+To support this API, create the following PostgreSQL tables (e.g., in Supabase). Indexes have been added to optimize key retrieval paths.
+
+### 1. Users Table
+Tracks registration credentials. The `email` field is indexed to ensure login query performance.
+
+```sql
+CREATE TABLE Users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Optimize login and uniqueness check lookups
+CREATE INDEX idx_users_email ON Users(email);
+```
+
+### 2. Todos Table
+Tracks high-level project lists.
+
+```sql
+CREATE TABLE Todos (
+    todo_id SERIAL PRIMARY KEY,
+    todo_name VARCHAR(255) NOT NULL,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_todos_user_id ON Todos(user_id);
+```
+
+### 3. Tasks Table
+Tracks individual items inside a Todo.
+
+```sql
+CREATE TABLE Tasks (
+    id SERIAL PRIMARY KEY,
+    task_name TEXT NOT NULL,
+    tags VARCHAR(100),
+    todo_id INT REFERENCES Todos(todo_id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Optimize join operations when retrieving tasks for a specific todo list
+CREATE INDEX idx_tasks_todo_id ON Tasks(todo_id);
+```
